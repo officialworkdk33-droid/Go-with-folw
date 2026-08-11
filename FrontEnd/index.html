@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manifest — HAWB Document Merger</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Cargo Documentation · Manifest Utility</p>
+  <h1>HAWB Document Merger</h1>
+  <p>Scans a batch of mixed documents (PDF, Word, Excel, scans), finds the House Airway Bill number in each one, groups them into shipment folders, and merges each group into one named PDF.</p>
+</header>
+
+<main>
+
+  <!-- ACCESS CODE (only shown if the deployment requires one) -->
+  <section class="step" id="accessStep" style="display:none;">
+    <div class="step-head"><span class="step-num">🔒</span><h2>Access code</h2></div>
+    <p class="hint">This deployment is protected. Enter the access code you were given.</p>
+    <input type="text" id="accessCode" placeholder="Access code">
+  </section>
+
+  <!-- STEP 1 -->
+  <section class="step" id="step1">
+    <div class="step-head"><span class="step-num">01</span><h2>Name this merge run</h2></div>
+    <p class="hint">This label is combined with each shipment's HAWB number to name the merged PDF — e.g. <code>ACME-INVOICES_HAWB88213AX.pdf</code>.</p>
+    <label class="field-label" for="commonName">Common name</label>
+    <input type="text" id="commonName" placeholder="e.g. ACME-INVOICES">
+  </section>
+
+  <!-- STEP 2 -->
+  <section class="step disabled" id="step2">
+    <div class="step-head"><span class="step-num">02</span><h2>Add the documents</h2></div>
+    <p class="hint" id="step2Hint">Upload files, or drag a folder from this device into the drop zone.</p>
+
+    <div id="folderPathField" style="display:none;">
+      <label class="field-label" for="folderPath">Server folder path (optional)</label>
+      <input type="text" id="folderPath" placeholder="/path/to/main-folder">
+    </div>
+
+    <div class="dropzone" id="dropzone" style="margin-top:14px;">
+      <p>…or drag files / a folder here</p>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="btn secondary" id="pickFilesBtn">Choose Files</button>
+        <button class="btn secondary" id="pickFolderBtn">Choose Folder</button>
+      </div>
+      <input type="file" id="filesInput" multiple style="display:none">
+      <input type="file" id="folderInput" webkitdirectory multiple style="display:none">
+      <div class="filecount" id="fileCount">No files added yet</div>
+      <div id="fileListPreview"></div>
+    </div>
+    <button class="btn amber block" id="scanBtn">Scan &amp; Match to HAWB</button>
+    <div class="progress-wrap" id="scanProgressWrap" style="display:none;">
+      <div class="progress-bar"><div class="progress-fill indeterminate" id="scanProgressFill"></div></div>
+      <div class="progress-label" id="scanProgressLabel">Scanning on server…</div>
+    </div>
+    <div class="log" id="scanLog"></div>
+  </section>
+
+  <!-- STEP 3 -->
+  <section class="step disabled" id="step3">
+    <div class="step-head"><span class="step-num">03</span><h2>Review shipment groups</h2></div>
+    <p class="summary-line" id="groupSummary"></p>
+    <p class="hint">Each card is one subfolder, named by its HAWB. Edit any code below a file if the match looks wrong — the file will move to the folder you type.</p>
+    <div id="groupsContainer"></div>
+  </section>
+
+  <!-- STEP 4 -->
+  <section class="step disabled" id="step4">
+    <div class="step-head"><span class="step-num">04</span><h2>Build subfolders &amp; merge</h2></div>
+    <p class="hint">Creates one ZIP: each subfolder holds the original matched files plus one merged PDF named <span id="nameHint" style="font-family:var(--mono);"></span>.</p>
+    <button class="btn amber block" id="buildBtn">Build &amp; Download ZIP</button>
+    <div class="progress-wrap" id="buildProgressWrap" style="display:none;">
+      <div class="progress-bar"><div class="progress-fill indeterminate" id="buildProgressFill"></div></div>
+      <div class="progress-label" id="buildProgressLabel">Building on server…</div>
+    </div>
+    <div class="log" id="buildLog"></div>
+    <div class="result-box" id="resultBox">
+      <h3>Done</h3>
+      <p id="resultSummary"></p>
+      <a class="download-link" id="downloadLink" href="#">Download ZIP →</a>
+    </div>
+  </section>
+
+  <p class="footnote">
+    HAWB detection looks for labels like "House Airway Bill / HAWB / AWB" first, then falls back to a Master-AWB-style number pattern, then the filename. Scanned images are read with server-side OCR. Old binary <code>.doc</code> files have limited text extraction — check those matches in Step 3. PDF pages are copied at full quality; DOCX/XLSX/unsupported files are merged in as formatted text pages, with the original file always kept in its subfolder regardless.
+  </p>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
